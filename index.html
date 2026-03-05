@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unseen Scars · Mental Health · Youth Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red: #ff2d55;
+      --red-soft: #ff6b6b;
+      --white: #ffffff;
+      --cream: #fff5f5;
+      --navy: #0a0e27;
+      --mid: #131836;
+      --glass: rgba(255,255,255,0.07);
+      --glass-border: rgba(255,255,255,0.18);
+      --accent-blue: #4fc3f7;
+      --accent-yellow: #ffd54f;
+      --accent-green: #69f0ae;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: #fff;
+      cursor: none;
+    }
+
+    /* ─── CUSTOM CURSOR ─── */
+    #cursor {
+      position: fixed; width: 18px; height: 18px;
+      background: var(--red); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%,-50%);
+      transition: transform 0.1s, width 0.25s, height 0.25s, background 0.25s;
+      mix-blend-mode: screen;
+    }
+    #cursor-ring {
+      position: fixed; width: 44px; height: 44px;
+      border: 2px solid rgba(255,45,85,0.5);
+      border-radius: 50%; pointer-events: none; z-index: 9998;
+      transform: translate(-50%,-50%);
+      transition: transform 0.18s ease, width 0.3s, height 0.3s;
+    }
+
+    /* ─── CANVAS PARTICLES ─── */
+    #particle-canvas {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 1;
+      opacity: 0.55;
+    }
+
+    /* ─── SLIDES ─── */
+    .deck { position: relative; width: 100vw; height: 100vh; }
+
+    .slide {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0;
+      transform: translateY(30px) scale(0.97);
+      transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+      z-index: 2;
+    }
+    .slide.active {
+      opacity: 1; transform: translateY(0) scale(1);
+      pointer-events: auto; z-index: 10;
+    }
+    .slide.exit {
+      opacity: 0; transform: translateY(-20px) scale(1.02);
+      pointer-events: none;
+    }
+
+    /* ─── SLIDE BG LAYERS ─── */
+    .slide-bg {
+      position: absolute; inset: 0; z-index: 0;
+      overflow: hidden;
+    }
+    .slide-bg img {
+      width: 100%; height: 100%;
+      object-fit: cover; opacity: 0.12;
+      filter: saturate(1.4) blur(1px);
+      transform: scale(1.05);
+      transition: transform 8s ease;
+    }
+    .slide.active .slide-bg img { transform: scale(1); }
+    .slide-bg-overlay {
+      position: absolute; inset: 0;
+    }
+
+    /* ─── GLASS CARD ─── */
+    .card {
+      position: relative; z-index: 5;
+      background: rgba(10,14,39,0.45);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 2.5rem;
+      padding: 3rem 4rem;
+      max-width: 1360px;
+      width: calc(100% - 6rem);
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06) inset,
+        0 40px 80px -20px rgba(0,0,0,0.7),
+        0 0 120px -40px rgba(255,45,85,0.15);
+      transition: box-shadow 0.4s, border-color 0.4s;
+    }
+    .card:hover {
+      border-color: rgba(255,45,85,0.4);
+      box-shadow:
+        0 0 0 1px rgba(255,45,85,0.2) inset,
+        0 50px 100px -20px rgba(0,0,0,0.8),
+        0 0 150px -30px rgba(255,45,85,0.25);
+    }
+
+    /* ─── TYPOGRAPHY ─── */
+    .title-font { font-family: 'Syne', sans-serif; }
+    
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(3.5rem, 7vw, 6.5rem);
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 0%, #ffcdd2 40%, #ff2d55 70%, #ff6b6b 100%);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: clamp(2.5rem, 4.5vw, 4rem);
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      background: linear-gradient(135deg, #fff 0%, #ffe0e6 50%, #ff6b6b 100%);
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+      margin-bottom: 1.5rem;
+    }
+    .body-text {
+      font-size: clamp(1.2rem, 2vw, 1.7rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.88);
+      line-height: 1.6;
+    }
+    .accent-text {
+      font-size: clamp(1rem, 1.6vw, 1.4rem);
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    /* ─── LIST ITEMS ─── */
+    ul.feature-list { list-style: none; display: flex; flex-direction: column; gap: 0.85rem; }
+    ul.feature-list li {
+      display: flex; align-items: center; gap: 1rem;
+      font-size: clamp(1.1rem, 1.8vw, 1.55rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.9);
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      cursor: default;
+    }
+    ul.feature-list li:hover {
+      background: rgba(255,45,85,0.12);
+      border-color: rgba(255,45,85,0.3);
+      transform: translateX(10px);
+      color: #fff;
+    }
+    ul.feature-list li .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--red); flex-shrink: 0;
+      box-shadow: 0 0 12px var(--red);
+      transition: transform 0.3s;
+    }
+    ul.feature-list li:hover .dot { transform: scale(1.8); }
+
+    /* ─── IMAGES ─── */
+    .img-frame {
+      position: relative; flex-shrink: 0;
+    }
+    .img-blob-wrap {
+      position: relative;
+      width: clamp(200px, 22vw, 280px);
+      height: clamp(200px, 22vw, 280px);
+    }
+    .img-blob-wrap::before {
+      content: '';
+      position: absolute; inset: -8px;
+      background: conic-gradient(from 0deg, var(--red), #ff9a9e, #fff, var(--red));
+      border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+      animation: spin-border 6s linear infinite;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+    .img-blob-wrap:hover::before { opacity: 1; }
+    .img-blob-wrap::after {
+      content: '';
+      position: absolute; inset: -1px;
+      background: var(--navy);
+      border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+    }
+    .img-blob-wrap img {
+      position: relative; z-index: 1;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+      transition: border-radius 0.6s ease, transform 0.5s ease, filter 0.4s;
+      filter: saturate(1.1) brightness(0.95);
+    }
+    .img-blob-wrap:hover img {
+      border-radius: 45% 55% 40% 60% / 55% 45% 55% 45%;
+      transform: scale(1.04);
+      filter: saturate(1.3) brightness(1.05);
+    }
+    @keyframes spin-border {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* ─── LARGE IMAGE BLOB (cover) ─── */
+    .img-blob-large {
+      width: clamp(260px, 30vw, 360px);
+      height: clamp(260px, 30vw, 360px);
+    }
+
+    /* ─── FLEX LAYOUTS ─── */
+    .row { display: flex; align-items: center; gap: 3.5rem; flex-wrap: wrap; justify-content: center; }
+    .col { display: flex; flex-direction: column; gap: 1.2rem; }
+    .text-side { flex: 1; min-width: 280px; }
+
+    /* ─── RED ACCENT PILL ─── */
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.4rem 1.2rem;
+      background: rgba(255,45,85,0.15);
+      border: 1px solid rgba(255,45,85,0.35);
+      border-radius: 100px;
+      font-size: 0.95rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: #ff8fa3;
+      margin-bottom: 1rem;
+    }
+    .pill span { width: 6px; height: 6px; border-radius: 50%; background: var(--red); box-shadow: 0 0 8px var(--red); }
+
+    /* ─── STAT CARDS ─── */
+    .stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
+    .stat-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 1.5rem;
+      padding: 1.4rem;
+      text-align: center;
+      transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      cursor: default;
+    }
+    .stat-card:hover {
+      background: rgba(255,45,85,0.1);
+      border-color: rgba(255,45,85,0.4);
+      transform: translateY(-6px) scale(1.02);
+      box-shadow: 0 20px 40px -10px rgba(255,45,85,0.25);
+    }
+    .stat-card .stat-num {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, var(--red-soft));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .stat-card .stat-label { font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 0.3rem; }
+
+    /* ─── IMAGE TRIO (slide 2) ─── */
+    .trio { display: flex; gap: 1.2rem; flex-direction: column; }
+    .trio-row { display: flex; gap: 1.2rem; justify-content: center; }
+    .trio-img {
+      width: 130px; height: 130px;
+      object-fit: cover;
+      border-radius: 40% 60% 35% 65% / 55% 45% 65% 35%;
+      border: 2px solid rgba(255,255,255,0.2);
+      transition: all 0.45s cubic-bezier(0.34,1.56,0.64,1);
+      filter: saturate(1.1);
+    }
+    .trio-img:hover {
+      border-radius: 50%;
+      transform: scale(1.12) rotate(-2deg);
+      border-color: var(--red);
+      box-shadow: 0 15px 35px -8px rgba(255,45,85,0.5);
+    }
+    .trio-img.wide {
+      width: 270px; height: 130px;
+      border-radius: 60px;
+    }
+
+    /* ─── CALLOUT BOX ─── */
+    .callout {
+      background: linear-gradient(135deg, rgba(255,45,85,0.15), rgba(255,107,107,0.08));
+      border: 1px solid rgba(255,45,85,0.3);
+      border-radius: 1.5rem;
+      padding: 1.4rem 1.8rem;
+      margin-top: 1.2rem;
+    }
+    .callout p { color: #ffcdd2; font-weight: 400; }
+
+    /* ─── BIG QUOTE ─── */
+    .quote-mark {
+      font-family: 'Syne', sans-serif;
+      font-size: 8rem; line-height: 0.6;
+      color: var(--red); opacity: 0.35;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ─── COVER DECO CIRCLES ─── */
+    .deco-circle {
+      position: absolute; border-radius: 50%;
+      pointer-events: none;
+      animation: pulse-circle 4s ease-in-out infinite;
+    }
+    @keyframes pulse-circle {
+      0%, 100% { transform: scale(1); opacity: 0.15; }
+      50% { transform: scale(1.08); opacity: 0.28; }
+    }
+
+    /* ─── SLIDE NUMBER ─── */
+    .slide-num {
+      position: absolute; bottom: 2rem; right: 2.5rem;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em;
+      color: rgba(255,255,255,0.35);
+      z-index: 20;
+    }
+
+    /* ─── PROGRESS ─── */
+    #progress-track {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      height: 4px; background: rgba(255,255,255,0.08);
+      z-index: 1000;
+    }
+    #progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), #ff9a9e, #fff, var(--red));
+      background-size: 200% 100%;
+      animation: progress-shimmer 2s linear infinite;
+      transition: width 0.5s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: 0 0 12px rgba(255,45,85,0.8);
+    }
+    @keyframes progress-shimmer {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+
+    /* ─── CONTROLS ─── */
+    #controls {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(10,14,39,0.7); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 100px; padding: 0.6rem 1.8rem;
+      font-size: 0.82rem; color: rgba(255,255,255,0.4);
+      letter-spacing: 0.15em; text-transform: uppercase;
+      z-index: 999;
+    }
+
+    /* ─── NAV ARROWS ─── */
+    .nav-btn {
+      position: fixed; top: 50%; transform: translateY(-50%);
+      width: 52px; height: 52px;
+      background: rgba(255,45,85,0.12);
+      border: 1px solid rgba(255,45,85,0.25);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: none; z-index: 999;
+      color: rgba(255,255,255,0.6);
+      font-size: 1.3rem;
+      transition: all 0.25s;
+    }
+    .nav-btn:hover {
+      background: rgba(255,45,85,0.25);
+      border-color: rgba(255,45,85,0.6);
+      color: #fff;
+      transform: translateY(-50%) scale(1.1);
+    }
+    #btn-prev { left: 1.2rem; }
+    #btn-next { right: 1.2rem; }
+
+    /* ─── SPECIAL: SLIDE 1 COVER ─── */
+    .cover-eyebrow {
+      font-size: 0.9rem; font-weight: 500; letter-spacing: 0.3em;
+      text-transform: uppercase; color: #ff8fa3; margin-bottom: 1.2rem;
+      display: flex; align-items: center; gap: 0.8rem;
+    }
+    .cover-eyebrow::before {
+      content: ''; width: 40px; height: 2px; background: var(--red);
+      box-shadow: 0 0 8px var(--red);
+    }
+    .cover-tagline {
+      font-size: clamp(1.1rem, 2vw, 1.5rem);
+      color: rgba(255,255,255,0.65);
+      font-weight: 300; margin-top: 1.2rem; line-height: 1.5;
+    }
+    .cover-brand {
+      font-family: 'Syne', sans-serif; font-size: 0.85rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); margin-top: 2rem;
+    }
+
+    /* ─── SLIDE 17 FINAL ─── */
+    .final-quote {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 5rem);
+      font-weight: 800; text-align: center; line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .final-quote em { font-style: normal; color: var(--red-soft); }
+    .portrait-ring {
+      width: 130px; height: 130px;
+      border-radius: 50%; object-fit: cover;
+      border: 3px solid rgba(255,45,85,0.5);
+      box-shadow: 0 0 40px rgba(255,45,85,0.3);
+      transition: box-shadow 0.4s, transform 0.4s;
+    }
+    .portrait-ring:hover {
+      box-shadow: 0 0 60px rgba(255,45,85,0.6);
+      transform: scale(1.06);
+    }
+
+    /* ─── FLOATING LABEL BADGES ─── */
+    .badge {
+      position: absolute;
+      background: rgba(255,45,85,0.18);
+      border: 1px solid rgba(255,45,85,0.35);
+      border-radius: 100px; padding: 0.35rem 1rem;
+      font-size: 0.78rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: #ffb3c1; white-space: nowrap;
+      animation: float-badge 5s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes float-badge {
+      0%,100% { transform: translateY(0px) rotate(-1deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+    }
+
+    /* ─── GRADIENT MESH BLOBS (BG) ─── */
+    .mesh-blob {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); pointer-events: none;
+      animation: mesh-drift 10s ease-in-out infinite alternate;
+    }
+    @keyframes mesh-drift {
+      0% { transform: translate(0,0) scale(1); }
+      100% { transform: translate(30px, 20px) scale(1.1); }
+    }
+
+    /* ─── REVEAL ANIMATIONS ─── */
+    .slide.active .reveal {
+      animation: reveal-up 0.6s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    .reveal-1 { animation-delay: 0.1s; }
+    .reveal-2 { animation-delay: 0.22s; }
+    .reveal-3 { animation-delay: 0.34s; }
+    .reveal-4 { animation-delay: 0.46s; }
+    @keyframes reveal-up {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── GRID LINES DECO ─── */
+    .grid-deco {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Particles -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- Progress -->
+<div id="progress-track"><div id="progress-fill" style="width:5.88%"></div></div>
+
+<!-- Nav -->
+<button class="nav-btn" id="btn-prev" onclick="prevSlide()">&#8592;</button>
+<button class="nav-btn" id="btn-next" onclick="nextSlide()">&#8594;</button>
+<div id="controls">← → arrow · space · click</div>
+
+<div class="deck">
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 1 · COVER
+══════════════════════════════════════════════════════════════ -->
+<div class="slide active" id="s1">
+  <!-- Mesh blobs -->
+  <div class="mesh-blob" style="width:500px;height:500px;background:radial-gradient(circle,rgba(255,45,85,0.22),transparent 70%);top:-100px;left:-100px;animation-duration:12s;"></div>
+  <div class="mesh-blob" style="width:400px;height:400px;background:radial-gradient(circle,rgba(79,195,247,0.12),transparent 70%);bottom:-80px;right:-80px;animation-duration:9s;animation-delay:-3s;"></div>
+
+  <!-- BG photo -->
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1529156069895-2b4f7c2c8a4e?q=80&w=2669&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.88) 0%,rgba(20,10,30,0.7) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row" style="gap:4rem;">
+    <div class="text-side reveal reveal-1">
+      <div class="cover-eyebrow">Tobhana Wellness · Youth Edition</div>
+      <h1>Unseen<br>Scars</h1>
+      <p class="cover-tagline">Hidden struggles in student life —<br>real pain, real strength, real hope.</p>
+      <p class="cover-brand">Mental Health Awareness · 2025</p>
+    </div>
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap img-blob-large">
+        <img src="https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=2560&auto=format&fit=crop" 
+             alt="expressive young person" 
+             onerror="this.src='https://images.unsplash.com/photo-1529156069895-2b4f7c2c8a4e?q=80&w=2669&auto=format&fit=crop'">
+      </div>
+      <!-- floating badges -->
+      <div class="badge" style="top:-10px;right:-30px;animation-delay:0s;">1 in 5 students</div>
+      <div class="badge" style="bottom:10px;left:-40px;animation-delay:2.5s;">You are not alone</div>
+    </div>
+  </div>
+  <div class="slide-num">01 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 2 · OPENING QUESTION
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s2">
+  <div class="mesh-blob" style="width:450px;height:450px;background:radial-gradient(circle,rgba(255,45,85,0.15),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:10s;"></div>
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1543269664-56d93c1b41a6?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.75) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Let's be honest</div>
+      <h2>Does any of this<br>sound familiar?</h2>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Overwhelmed by academic pressure?</li>
+        <li><span class="dot"></span>Feel like you don't truly belong?</li>
+        <li><span class="dot"></span>Fear disappointing everyone around you?</li>
+        <li><span class="dot"></span>Exhausted — but keep pushing anyway?</li>
+      </ul>
+      <div class="callout reveal reveal-3">
+        <p>Many students silently relate. You are not broken — you are human.</p>
+      </div>
+    </div>
+    <!-- trio images -->
+    <div class="trio reveal reveal-2">
+      <div class="trio-row">
+        <img class="trio-img" src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=400&auto=format&fit=crop" alt="friends">
+        <img class="trio-img" src="https://images.unsplash.com/photo-1517486808906-6ca8b3f8e1c1?q=80&w=400&auto=format&fit=crop" alt="student thinking">
+      </div>
+      <div class="trio-row">
+        <img class="trio-img wide" src="https://images.unsplash.com/photo-1543269664-56d93c1b41a6?q=80&w=600&auto=format&fit=crop" alt="students outside">
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">02 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 3 · MENTAL HEALTH MATTERS
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s3">
+  <div class="mesh-blob" style="width:600px;height:300px;background:radial-gradient(ellipse,rgba(255,45,85,0.12),transparent 70%);top:0;right:0;animation-duration:11s;"></div>
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1499728603263-13726abce5fd?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(160deg,rgba(10,14,39,0.85) 0%,rgba(15,10,35,0.82) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=2560&auto=format&fit=crop" 
+             alt="person in nature mindful"
+             onerror="this.src='https://images.unsplash.com/photo-1499728603263-13726abce5fd?q=80&w=2670&auto=format&fit=crop'">
+      </div>
+    </div>
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Why it matters</div>
+      <h2>Mental health<br>shapes everything</h2>
+      <ul class="feature-list">
+        <li><span class="dot"></span>How we think & process information</li>
+        <li><span class="dot"></span>How we feel about ourselves</li>
+        <li><span class="dot"></span>How we handle stress & pressure</li>
+        <li><span class="dot"></span>How we connect with others</li>
+      </ul>
+      <div class="stat-grid">
+        <div class="stat-card"><div class="stat-num">76%</div><div class="stat-label">students feel overwhelmed</div></div>
+        <div class="stat-card"><div class="stat-num">40%</div><div class="stat-label">never seek help</div></div>
+        <div class="stat-card"><div class="stat-num">1 in 4</div><div class="stat-label">experience depression</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">03 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 4 · THE HIDDEN SIDE
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s4">
+  <div class="mesh-blob" style="width:500px;height:500px;background:radial-gradient(circle,rgba(100,50,255,0.1),transparent 70%);bottom:-100px;left:-100px;animation-duration:13s;"></div>
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.92) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>The invisible weight</div>
+      <h2>What no one<br>sees</h2>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Emotional pressure & internal chaos</li>
+        <li><span class="dot"></span>Identity struggles & who am I?</li>
+        <li><span class="dot"></span>Financial stress & survival mode</li>
+        <li><span class="dot"></span>Fear of failure & disappointment</li>
+        <li><span class="dot"></span>The toxic comparison spiral</li>
+      </ul>
+      <div class="callout">
+        <p>"The heaviest thing you carry is the mask you wear every day."</p>
+      </div>
+    </div>
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?q=80&w=2670&auto=format&fit=crop" alt="hiding face">
+      </div>
+      <div class="badge" style="top:0;right:-20px;animation-delay:1s;">Often invisible</div>
+    </div>
+  </div>
+  <div class="slide-num">04 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 5 · SIX UNSEEN SCARS OVERVIEW
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s5">
+  <div class="mesh-blob" style="width:700px;height:300px;background:radial-gradient(ellipse,rgba(255,45,85,0.1),transparent 70%);top:0;right:0;animation-duration:9s;"></div>
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1496449903678-68ddcb189a24?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.8) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card reveal reveal-1" style="max-width:1200px;">
+    <div class="pill"><span></span>The 6 unseen scars</div>
+    <h2 style="margin-bottom:2rem;">Wounds that don't show up on skin</h2>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;">
+      <div class="stat-card" style="text-align:left;padding:1.4rem 1.6rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">😮‍💨</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:#ffb3c1;margin-bottom:0.4rem;">Chronic Stress</div>
+        <div style="font-size:0.9rem;color:rgba(255,255,255,0.55);">constant, relentless, invisible</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.4rem 1.6rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">🎭</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:#ffb3c1;margin-bottom:0.4rem;">Imposter Syndrome</div>
+        <div style="font-size:0.9rem;color:rgba(255,255,255,0.55);">"I don't belong here"</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.4rem 1.6rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">⚡</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:#ffb3c1;margin-bottom:0.4rem;">Performance Anxiety</div>
+        <div style="font-size:0.9rem;color:rgba(255,255,255,0.55);">paralysed by expectation</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.4rem 1.6rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">🙏</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:#ffb3c1;margin-bottom:0.4rem;">Spiritual Guilt</div>
+        <div style="font-size:0.9rem;color:rgba(255,255,255,0.55);">faith vs mental struggle</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.4rem 1.6rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">🌑</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:#ffb3c1;margin-bottom:0.4rem;">Quiet Depression</div>
+        <div style="font-size:0.9rem;color:rgba(255,255,255,0.55);">smiling outside, empty inside</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.4rem 1.6rem;">
+        <div style="font-size:1.8rem;margin-bottom:0.5rem;">🔋</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:700;color:#ffb3c1;margin-bottom:0.4rem;">Functional Burnout</div>
+        <div style="font-size:0.9rem;color:rgba(255,255,255,0.55);">performing, but drained</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">05 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 6 · CHRONIC STRESS
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s6">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.88) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+  <div class="mesh-blob" style="width:400px;height:400px;background:radial-gradient(circle,rgba(255,45,85,0.12),transparent 70%);top:10%;right:5%;"></div>
+
+  <div class="card row">
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=2670&auto=format&fit=crop" alt="overworked student">
+      </div>
+    </div>
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Scar 01</div>
+      <h2>Chronic Stress</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">Not the normal pressure before a deadline. This is a constant, grinding state of tension that never fully goes away.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Mental & physical exhaustion</li>
+        <li><span class="dot"></span>Disturbed sleep & appetite changes</li>
+        <li><span class="dot"></span>Constant feeling of overwhelm</li>
+        <li><span class="dot"></span>Short temper, withdrawal from people</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">06 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 7 · IMPOSTER SYNDROME
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s7">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Scar 02</div>
+      <h2>Imposter<br>Syndrome</h2>
+      <div class="quote-mark">"</div>
+      <p class="body-text" style="color:#ffcdd2;font-style:italic;font-size:clamp(1.2rem,2.2vw,1.8rem);">I don't deserve to be here. Everyone else is smarter than me.</p>
+      <ul class="feature-list" style="margin-top:1.2rem;">
+        <li><span class="dot"></span>Chronic feeling of being a fraud</li>
+        <li><span class="dot"></span>Downplaying your own achievements</li>
+        <li><span class="dot"></span>Fear of being "found out"</li>
+      </ul>
+    </div>
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1521791050896-6a0c4c6e7c5e?q=80&w=2669&auto=format&fit=crop" alt="feeling lost">
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">07 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 8 · PERFORMANCE ANXIETY
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s8">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1485217988980-11786ced9454?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(160deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+  <div class="mesh-blob" style="width:500px;height:500px;background:radial-gradient(circle,rgba(255,180,0,0.07),transparent 70%);bottom:-100px;right:-100px;animation-duration:14s;"></div>
+
+  <div class="card row">
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1485217988980-11786ced9454?q=80&w=2670&auto=format&fit=crop" alt="exam stress">
+      </div>
+    </div>
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Scar 03</div>
+      <h2>Performance<br>Anxiety</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">The body goes into fight-or-flight mode — not for survival, but for a test paper.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Panic attacks before exams</li>
+        <li><span class="dot"></span>Fear of public speaking & presenting</li>
+        <li><span class="dot"></span>Blanking out under pressure</li>
+        <li><span class="dot"></span>Avoiding opportunities due to fear</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">08 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 9 · SPIRITUAL GUILT
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s9">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1499728603263-13726abce5fd?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.88) 0%,rgba(5,10,30,0.82) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Scar 04</div>
+      <h2>Spiritual Guilt</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">When mental health struggles are mistaken for weak faith — creating a double burden.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span>"If I just prayed more, I'd be fine"</li>
+        <li><span class="dot"></span>Shame around seeking therapy</li>
+        <li><span class="dot"></span>Hiding struggles from faith communities</li>
+      </ul>
+      <div class="callout">
+        <p>Mental struggle is <strong style="color:#ff8fa3;">not</strong> a sign of weak faith. God designed the mind — and healers.</p>
+      </div>
+    </div>
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1499728603263-13726abce5fd?q=80&w=2670&auto=format&fit=crop" alt="contemplation">
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">09 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 10 · QUIET DEPRESSION
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s10">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1516211697506-83621c2835a1?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(160deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.8) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1516211697506-83621c2835a1?q=80&w=2670&auto=format&fit=crop" alt="alone in crowd">
+      </div>
+    </div>
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Scar 05</div>
+      <h2>Quiet<br>Depression</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">They attend every lecture. They laugh at lunch. They respond to messages. But inside — nothing.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Smiling on the outside, hollow within</li>
+        <li><span class="dot"></span>Losing interest in things once loved</li>
+        <li><span class="dot"></span>Exhausted by simply existing</li>
+        <li><span class="dot"></span>Functioning — but not truly living</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">10 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 11 · FUNCTIONAL BURNOUT
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s11">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+  <div class="mesh-blob" style="width:450px;height:450px;background:radial-gradient(circle,rgba(255,45,85,0.1),transparent 70%);top:-80px;left:-80px;animation-duration:11s;"></div>
+
+  <div class="card row">
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Scar 06</div>
+      <h2>Functional<br>Burnout</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">Still submitting assignments. Still leading the group. Still showing up. But running on fumes and willpower alone.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Achieving while completely depleted</li>
+        <li><span class="dot"></span>Numbness disguised as productivity</li>
+        <li><span class="dot"></span>No joy in accomplishments</li>
+        <li><span class="dot"></span>Dread for each new day</li>
+      </ul>
+    </div>
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=2670&auto=format&fit=crop" alt="tired student">
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">11 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 12 · ACADEMIC PRESSURE
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s12">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1456406644174-2582954c1396?q=80&w=2669&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1456406644174-2582954c1396?q=80&w=2669&auto=format&fit=crop" alt="books stress">
+      </div>
+    </div>
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>The pressure cooker</div>
+      <h2>Academic<br>Pressure</h2>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Fear of disappointing parents & family</li>
+        <li><span class="dot"></span>Grade = self-worth = identity</li>
+        <li><span class="dot"></span>Sacrificing sleep, health, joy for marks</li>
+        <li><span class="dot"></span>The weight of being a "first generation" student</li>
+      </ul>
+      <div class="callout">
+        <p>Your grade point average does <strong style="color:#ff8fa3;">not</strong> define your value as a human being.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">12 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 13 · THE COMPARISON TRAP
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s13">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=2574&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.92) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Social media trap</div>
+      <h2>The Comparison<br>Trap</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">You're comparing your behind-the-scenes to everyone else's highlight reel.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Comparing grades, bodies, lifestyles</li>
+        <li><span class="dot"></span>Social media as a measuring stick</li>
+        <li><span class="dot"></span>"Everyone's thriving — why am I not?"</li>
+        <li><span class="dot"></span>FOMO as a chronic condition</li>
+      </ul>
+    </div>
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?q=80&w=2574&auto=format&fit=crop" alt="social media phone">
+      </div>
+      <div class="badge" style="bottom:-5px;right:-25px;animation-delay:1.5s;">Unplug & breathe</div>
+    </div>
+  </div>
+  <div class="slide-num">13 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 14 · SILENT SHAME
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s14">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1570612861542-284f4c12e75f?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.9) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card row">
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1570612861542-284f4c12e75f?q=80&w=2670&auto=format&fit=crop" alt="hidden shame">
+      </div>
+    </div>
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>The mask we wear</div>
+      <h2>The Silent<br>Shame</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">Leaders, athletes, high achievers — they're often hiding the deepest pain.</p>
+      <ul class="feature-list">
+        <li><span class="dot"></span>Pressure to appear strong always</li>
+        <li><span class="dot"></span>Leaders struggling in silence</li>
+        <li><span class="dot"></span>Cultural stigma around vulnerability</li>
+        <li><span class="dot"></span>Being "fine" as a full-time performance</li>
+      </ul>
+    </div>
+  </div>
+  <div class="slide-num">14 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 15 · BREAK THE STIGMA
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s15">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.88) 0%,rgba(5,10,30,0.82) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+  <div class="mesh-blob" style="width:600px;height:300px;background:radial-gradient(ellipse,rgba(105,240,174,0.08),transparent 70%);bottom:0;right:0;animation-duration:12s;"></div>
+
+  <div class="card row">
+    <div class="text-side reveal reveal-1">
+      <div class="pill"><span></span>Breaking barriers</div>
+      <h2>Break the<br>Stigma</h2>
+      <p class="body-text" style="margin-bottom:1.2rem;">Seeking help is not weakness. It is the most courageous thing a person can do.</p>
+      <ul class="feature-list">
+        <li><span class="dot" style="background:#69f0ae;box-shadow:0 0 12px #69f0ae;"></span>Campus counselling services</li>
+        <li><span class="dot" style="background:#69f0ae;box-shadow:0 0 12px #69f0ae;"></span>Peer support & listening circles</li>
+        <li><span class="dot" style="background:#69f0ae;box-shadow:0 0 12px #69f0ae;"></span>Faith-based mental wellness guidance</li>
+        <li><span class="dot" style="background:#69f0ae;box-shadow:0 0 12px #69f0ae;"></span>Professional therapy & psychiatry</li>
+      </ul>
+    </div>
+    <div class="img-frame reveal reveal-2">
+      <div class="img-blob-wrap">
+        <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=2670&auto=format&fit=crop" alt="support group">
+      </div>
+      <div class="badge" style="top:0;left:-30px;animation-delay:0.5s;border-color:rgba(105,240,174,0.4);color:#69f0ae;">Strength = seeking help</div>
+    </div>
+  </div>
+  <div class="slide-num">15 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 16 · SUPPORTING WELLBEING
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s16">
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=2669&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.88) 0%,rgba(10,14,39,0.78) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card reveal reveal-1" style="max-width:1200px;">
+    <div class="pill"><span></span>Everyday tools</div>
+    <h2 style="margin-bottom:2rem;">Supporting your wellbeing</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
+      <div class="stat-card" style="text-align:left;padding:1.6rem;">
+        <div style="font-size:2rem;margin-bottom:0.7rem;">⏰</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#ffb3c1;margin-bottom:0.3rem;">Time Management</div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.55);">Realistic goals, not perfect ones</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.6rem;">
+        <div style="font-size:2rem;margin-bottom:0.7rem;">🌙</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#ffb3c1;margin-bottom:0.3rem;">Rest & Sleep</div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.55);">Sleep is not laziness</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.6rem;">
+        <div style="font-size:2rem;margin-bottom:0.7rem;">💬</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#ffb3c1;margin-bottom:0.3rem;">Open Dialogue</div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.55);">Talk to someone you trust</div>
+      </div>
+      <div class="stat-card" style="text-align:left;padding:1.6rem;">
+        <div style="font-size:2rem;margin-bottom:0.7rem;">🏃</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:#ffb3c1;margin-bottom:0.3rem;">Movement & Nature</div>
+        <div style="font-size:0.85rem;color:rgba(255,255,255,0.55);">Your body needs to move</div>
+      </div>
+    </div>
+    <div class="trio-row" style="margin-top:1.5rem;justify-content:flex-start;gap:1.2rem;">
+      <img class="trio-img" src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=400&auto=format&fit=crop" alt="friends" style="width:100px;height:100px;">
+      <img class="trio-img" src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=400&auto=format&fit=crop" alt="graduates" style="width:100px;height:100px;">
+      <img class="trio-img" src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?q=80&w=400&auto=format&fit=crop" alt="mindfulness" style="width:100px;height:100px;">
+      <div style="flex:1;display:flex;align-items:center;">
+        <p class="body-text" style="font-size:1.1rem;color:rgba(255,255,255,0.55);">Small, consistent actions beat occasional perfection. Start today.</p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-num">16 / 17</div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+  SLIDE 17 · FINAL CALL TO ACTION
+══════════════════════════════════════════════════════════════ -->
+<div class="slide" id="s17">
+  <div class="mesh-blob" style="width:700px;height:700px;background:radial-gradient(circle,rgba(255,45,85,0.18),transparent 60%);top:50%;left:50%;transform:translate(-50%,-50%);animation-duration:8s;"></div>
+  <div class="slide-bg">
+    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop" alt="bg">
+    <div class="slide-bg-overlay" style="background:linear-gradient(135deg,rgba(10,14,39,0.88) 0%,rgba(10,14,39,0.82) 100%);"></div>
+  </div>
+  <div class="grid-deco"></div>
+
+  <div class="card reveal reveal-1" style="max-width:1100px;text-align:center;padding:3.5rem 4rem;">
+    <div class="pill" style="justify-content:center;margin-bottom:1.5rem;"><span></span>Tobhana Wellness</div>
+    <div class="final-quote">
+      No student should<br>struggle in <em>silence.</em>
+    </div>
+    <p class="body-text" style="margin-top:1.5rem;max-width:680px;margin-left:auto;margin-right:auto;color:rgba(255,255,255,0.65);">
+      Supportive communities, open conversations, and professional help can transform lives. Your struggle does not define your future — your courage to face it does.
+    </p>
+    <div style="display:flex;justify-content:center;align-items:center;gap:1.5rem;margin-top:2.5rem;flex-wrap:wrap;">
+      <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=400&auto=format&fit=crop" class="portrait-ring" alt="hopeful student">
+      <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=400&auto=format&fit=crop" class="portrait-ring" alt="students together">
+      <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=400&auto=format&fit=crop" class="portrait-ring" alt="support">
+    </div>
+    <div style="margin-top:2rem;display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;">
+      <div class="pill" style="font-size:0.8rem;">You are enough</div>
+      <div class="pill" style="font-size:0.8rem;">You are not alone</div>
+      <div class="pill" style="font-size:0.8rem;">Help is brave</div>
+    </div>
+  </div>
+  <div class="slide-num">17 / 17</div>
+</div>
+
+</div><!-- /deck -->
+
+
+<script>
+// ─── CURSOR ───────────────────────────────────────────────────
+const cur = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+function animCursor() {
+  rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15;
+  cur.style.left = mx + 'px'; cur.style.top = my + 'px';
+  ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+  requestAnimationFrame(animCursor);
+}
+animCursor();
+
+// ─── PARTICLES ────────────────────────────────────────────────
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor() { this.reset(); }
+  reset() {
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.vx = (Math.random() - 0.5) * 0.4;
+    this.vy = -Math.random() * 0.5 - 0.1;
+    this.life = Math.random();
+    this.maxLife = 0.6 + Math.random() * 0.4;
+    this.size = Math.random() * 2.5 + 0.5;
+    const palette = ['rgba(255,45,85,', 'rgba(255,150,160,', 'rgba(255,255,255,', 'rgba(79,195,247,'];
+    this.col = palette[Math.floor(Math.random() * palette.length)];
+  }
+  update() {
+    this.x += this.vx; this.y += this.vy;
+    this.life += 0.003;
+    if (this.life > this.maxLife || this.y < -10) this.reset();
+  }
+  draw() {
+    const a = Math.sin((this.life / this.maxLife) * Math.PI) * 0.5;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = this.col + a + ')';
+    ctx.fill();
+  }
+}
+
+for (let i = 0; i < 120; i++) particles.push(new Particle());
+
+function animParticles() {
+  ctx.clearRect(0, 0, W, H);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animParticles);
+}
+animParticles();
+
+// ─── SLIDES ───────────────────────────────────────────────────
+const slides = Array.from(document.querySelectorAll('.slide'));
+const fill = document.getElementById('progress-fill');
+let cur_slide = 0;
+
+function goTo(n) {
+  if (n < 0 || n >= slides.length) return;
+  slides[cur_slide].classList.remove('active');
+  slides[cur_slide].classList.add('exit');
+  setTimeout(() => slides[cur_slide < slides.length ? cur_slide : 0].classList.remove('exit'), 700);
+  const prev = cur_slide;
+  cur_slide = n;
+  slides[cur_slide].classList.add('active');
+  // re-trigger reveal animations
+  slides[cur_slide].querySelectorAll('.reveal').forEach(el => {
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = '';
+  });
+  fill.style.width = ((cur_slide + 1) / slides.length * 100) + '%';
+  setTimeout(() => slides[prev].classList.remove('exit'), 700);
+}
+
+function nextSlide() { goTo(cur_slide + 1); }
+function prevSlide() { goTo(cur_slide - 1); }
+
+document.addEventListener('keydown', e => {
+  if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); nextSlide(); }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); prevSlide(); }
+  if (e.key === 'f' || e.key === 'F') document.documentElement.requestFullscreen?.();
+});
+
+// click left/right halves
+document.addEventListener('click', e => {
+  if (e.target.closest('.nav-btn')) return;
+  e.clientX > window.innerWidth / 2 ? nextSlide() : prevSlide();
+});
+
+// cursor grows on nav buttons
+document.querySelectorAll('.nav-btn').forEach(btn => {
+  btn.addEventListener('mouseenter', () => { cur.style.width = '36px'; cur.style.height = '36px'; });
+  btn.addEventListener('mouseleave', () => { cur.style.width = '18px'; cur.style.height = '18px'; });
+});
+</script>
+</body>
+</html>
