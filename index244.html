@@ -789,205 +789,6 @@ h2{
 .tab-active-hope { background:linear-gradient(135deg,var(--blue),var(--blue-soft)) !important; color:#fff !important; }
 .tab-inactive    { background:rgba(255,255,255,0.82) !important; color:var(--navy-mid) !important; }
 
-/* ════════════════════════════════════════════════════════════
-   SLIDE 19 — THANK YOU
-════════════════════════════════════════════════════════════ */
-
-/* ── Orbiting rings around the whole slide ── */
-.ty-orbit {
-  position:absolute;border-radius:50%;
-  border:1.5px solid;pointer-events:none;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  animation:ty-spin linear infinite;
-}
-.ty-orbit-1 {
-  width:700px;height:700px;
-  border-color:rgba(232,0,61,0.12);
-  animation-duration:22s;
-}
-.ty-orbit-2 {
-  width:900px;height:900px;
-  border-color:rgba(26,111,255,0.10);
-  animation-duration:34s;
-  animation-direction:reverse;
-}
-.ty-orbit-3 {
-  width:1100px;height:1100px;
-  border-color:rgba(180,0,200,0.07);
-  animation-duration:48s;
-}
-@keyframes ty-spin {
-  from { transform:translate(-50%,-50%) rotate(0deg); }
-  to   { transform:translate(-50%,-50%) rotate(360deg); }
-}
-
-/* ── Card extra glow ── */
-.ty-card {
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.6) inset,
-    0 4px 0 rgba(255,255,255,0.9) inset,
-    0 60px 120px -20px rgba(10,22,40,0.16),
-    0 0 120px -30px rgba(232,0,61,0.2),
-    0 0 120px -30px rgba(26,111,255,0.18) !important;
-  animation:card-breathe 4s ease-in-out infinite;
-}
-@keyframes card-breathe {
-  0%,100% { box-shadow:0 0 0 1px rgba(255,255,255,0.6) inset, 0 60px 120px -20px rgba(10,22,40,0.16), 0 0 100px -30px rgba(232,0,61,0.18), 0 0 100px -30px rgba(26,111,255,0.15); }
-  50%      { box-shadow:0 0 0 1px rgba(255,255,255,0.8) inset, 0 70px 140px -20px rgba(10,22,40,0.2),  0 0 140px -20px rgba(232,0,61,0.28), 0 0 140px -20px rgba(26,111,255,0.22); }
-}
-
-/* ── Shimmer rule at top of card ── */
-.ty-shimmer-rule {
-  position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0;
-  background:linear-gradient(90deg,
-    transparent 0%,
-    rgba(232,0,61,0.6) 20%,
-    rgba(255,150,0,0.8) 40%,
-    rgba(26,111,255,0.7) 60%,
-    rgba(180,0,200,0.6) 80%,
-    transparent 100%);
-  background-size:200% 100%;
-  animation:shimmer-move 2.5s linear infinite;
-}
-@keyframes shimmer-move {
-  from { background-position:200% 0; }
-  to   { background-position:-200% 0; }
-}
-
-/* ── Icon row ── */
-.ty-icon-row { display:flex;justify-content:center;gap:0.8rem;margin-bottom:1.2rem; }
-.ty-icon {
-  font-size:2.2rem;display:inline-block;
-  animation:icon-bounce 2.8s ease-in-out infinite;
-  animation-delay:var(--d,0s);
-}
-@keyframes icon-bounce {
-  0%,100% { transform:translateY(0) rotate(0deg); }
-  30%     { transform:translateY(-10px) rotate(-6deg); }
-  60%     { transform:translateY(-4px) rotate(4deg); }
-}
-
-/* ── THANK YOU letters ── */
-.ty-main {
-  display:flex;justify-content:center;align-items:baseline;
-  gap:0.02em;margin-bottom:0.2rem;
-  filter:drop-shadow(0 4px 30px rgba(232,0,61,0.25));
-}
-.ty-letter {
-  font-family:'Playfair Display',serif;
-  font-weight:900;font-style:italic;
-  font-size:clamp(4rem,9vw,8.5rem);
-  line-height:1;letter-spacing:-0.02em;
-  display:inline-block;
-  background:linear-gradient(160deg,
-    var(--navy) 0%, #e8003d 40%, #ff8c42 70%, var(--blue) 100%);
-  background-size:300% 300%;
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  animation:
-    letter-drop  .7s cubic-bezier(.34,1.56,.64,1) both,
-    letter-shift  8s ease-in-out infinite alternate;
-  animation-delay:var(--d,0s), calc(var(--d,0s) + 0.7s);
-}
-.ty-space { width:0.3em; }
-@keyframes letter-drop {
-  from { opacity:0;transform:translateY(-60px) rotate(-8deg) scale(1.3); }
-  to   { opacity:1;transform:translateY(0)     rotate(0deg)  scale(1); }
-}
-@keyframes letter-shift {
-  0%   { background-position:0%   50%; }
-  50%  { background-position:100% 50%; }
-  100% { background-position:0%   50%; }
-}
-
-/* ── Animated underline ── */
-.ty-underline {
-  height:3px;border-radius:2px;
-  background:linear-gradient(90deg, var(--red), var(--blue-soft), var(--red));
-  background-size:200% 100%;
-  margin:0 auto 1.6rem;
-  animation:underline-grow .9s .6s cubic-bezier(.16,1,.3,1) both,
-            shimmer-move 2s linear infinite;
-  width:0;
-}
-.slide.active .ty-underline { width:280px; }
-@keyframes underline-grow {
-  from { width:0;opacity:0; }
-  to   { width:280px;opacity:1; }
-}
-
-/* ── Sub text ── */
-.ty-sub {
-  font-size:clamp(1.1rem,2vw,1.5rem);
-  font-weight:300;color:rgba(10,22,40,0.65);
-  margin-bottom:1rem;line-height:1.5;
-}
-.ty-sub em { color:var(--red);font-style:italic;font-weight:500; }
-
-/* ── Three dots ── */
-.ty-dots {
-  display:flex;justify-content:center;gap:0.7rem;margin-bottom:1.4rem;
-}
-.ty-dots span {
-  width:7px;height:7px;border-radius:50%;
-  display:inline-block;
-  animation:dot-pulse 1.8s ease-in-out infinite;
-}
-.ty-dots span:nth-child(1){background:var(--red);animation-delay:0s;}
-.ty-dots span:nth-child(2){background:var(--navy);animation-delay:.3s;}
-.ty-dots span:nth-child(3){background:var(--blue);animation-delay:.6s;}
-@keyframes dot-pulse {
-  0%,100%{transform:scale(1);opacity:0.6;}
-  50%    {transform:scale(1.6);opacity:1;}
-}
-
-/* ── Body ── */
-.ty-body {
-  font-size:clamp(0.95rem,1.5vw,1.2rem);
-  font-weight:300;color:var(--navy-mid);
-  line-height:1.8;margin-bottom:2rem;
-}
-
-/* ── Credit row ── */
-.ty-credit {
-  display:flex;align-items:center;justify-content:center;gap:1rem;
-  font-size:0.72rem;font-weight:600;letter-spacing:0.2em;
-  text-transform:uppercase;color:rgba(10,22,40,0.35);
-}
-.ty-credit-line {
-  flex:1;max-width:80px;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(10,22,40,0.2),transparent);
-}
-
-/* ── Pulse rings behind card ── */
-.ty-pulse-ring {
-  position:absolute;border-radius:50%;border:1.5px solid;
-  pointer-events:none;z-index:-1;
-  top:50%;left:50%;transform:translate(-50%,-50%);
-  animation:ty-pulse-out 3.5s ease-out infinite;
-}
-.ty-pr1 { width:200px;height:200px;border-color:rgba(232,0,61,0.25);animation-delay:0s; }
-.ty-pr2 { width:200px;height:200px;border-color:rgba(26,111,255,0.2);animation-delay:1.75s; }
-@keyframes ty-pulse-out {
-  0%   { width:200px;height:200px;opacity:0.7; }
-  100% { width:900px;height:900px;opacity:0; }
-}
-
-/* ── Floating word particles ── */
-.ty-word {
-  position:absolute;pointer-events:none;z-index:2;
-  font-family:'Playfair Display',serif;font-style:italic;
-  font-weight:700;white-space:nowrap;
-  opacity:0;
-  animation:word-float linear forwards;
-}
-@keyframes word-float {
-  0%   { opacity:0;transform:translateY(0) scale(0.8); }
-  15%  { opacity:1;transform:translateY(-20px) scale(1); }
-  80%  { opacity:0.7; }
-  100% { opacity:0;transform:translateY(-140px) scale(0.9); }
-}
-
-
 </style>
 </head>
 <body>
@@ -1042,7 +843,7 @@ h2{
       <div class="float-badge" style="bottom:0px;left:-45px;animation-delay:2s;">You are not alone</div>
     </div>
   </div>
-  <div class="slide-num">01 / 19</div>
+  <div class="slide-num">01 / 17</div>
 </div>
 
 
@@ -1076,7 +877,7 @@ h2{
       </div>
     </div>
   </div>
-  <div class="slide-num">02 / 19</div>
+  <div class="slide-num">02 / 17</div>
 </div>
 
 
@@ -1108,7 +909,7 @@ h2{
       </div>
     </div>
   </div>
-  <div class="slide-num">03 / 19</div>
+  <div class="slide-num">03 / 17</div>
 </div>
 
 
@@ -1140,7 +941,7 @@ h2{
       <div class="float-badge" style="top:0;right:-28px;animation-delay:1s;">Often invisible</div>
     </div>
   </div>
-  <div class="slide-num">04 / 19</div>
+  <div class="slide-num">04 / 17</div>
 </div>
 
 
@@ -1186,7 +987,7 @@ h2{
       </div>
     </div>
   </div>
-  <div class="slide-num">05 / 19</div>
+  <div class="slide-num">05 / 17</div>
 </div>
 
 
@@ -1219,7 +1020,7 @@ h2{
       </ul>
     </div>
   </div>
-  <div class="slide-num">06 / 19</div>
+  <div class="slide-num">06 / 17</div>
 </div>
 
 
@@ -1254,7 +1055,7 @@ h2{
       <img src="https://images.unsplash.com/photo-1521791050896-6a0c4c6e7c5e?q=80&w=800&auto=format&fit=crop" alt="feeling lost">
     </div>
   </div>
-  <div class="slide-num">07 / 19</div>
+  <div class="slide-num">07 / 17</div>
 </div>
 
 
@@ -1299,7 +1100,7 @@ h2{
       </ul>
     </div>
   </div>
-  <div class="slide-num">08 / 19</div>
+  <div class="slide-num">08 / 17</div>
 </div>
 
 
@@ -1336,7 +1137,7 @@ h2{
       <img src="https://images.unsplash.com/photo-1499728603263-13726abce5fd?q=80&w=800&auto=format&fit=crop" alt="contemplation">
     </div>
   </div>
-  <div class="slide-num">09 / 19</div>
+  <div class="slide-num">09 / 17</div>
 </div>
 
 
@@ -1368,7 +1169,7 @@ h2{
       </ul>
     </div>
   </div>
-  <div class="slide-num">10 / 19</div>
+  <div class="slide-num">10 / 17</div>
 </div>
 
 
@@ -1405,7 +1206,7 @@ h2{
       <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=800&auto=format&fit=crop" alt="tired student">
     </div>
   </div>
-  <div class="slide-num">11 / 19</div>
+  <div class="slide-num">11 / 17</div>
 </div>
 
 
@@ -1435,7 +1236,7 @@ h2{
       </div>
     </div>
   </div>
-  <div class="slide-num">12 / 19</div>
+  <div class="slide-num">12 / 17</div>
 </div>
 
 
@@ -1464,7 +1265,7 @@ h2{
       <div class="float-badge" style="bottom:0;right:-30px;animation-delay:1.5s;">Unplug &amp; breathe</div>
     </div>
   </div>
-  <div class="slide-num">13 / 19</div>
+  <div class="slide-num">13 / 17</div>
 </div>
 
 
@@ -1492,7 +1293,7 @@ h2{
       </ul>
     </div>
   </div>
-  <div class="slide-num">14 / 19</div>
+  <div class="slide-num">14 / 17</div>
 </div>
 
 
@@ -1521,7 +1322,7 @@ h2{
       <div class="float-badge" style="top:-8px;left:-35px;animation-delay:0.5s;border-color:rgba(26,111,255,0.25);color:var(--blue);">Strength = seeking help</div>
     </div>
   </div>
-  <div class="slide-num">15 / 19</div>
+  <div class="slide-num">15 / 17</div>
 </div>
 
 
@@ -1549,7 +1350,7 @@ h2{
       </div>
     </div>
   </div>
-  <div class="slide-num">16 / 19</div>
+  <div class="slide-num">16 / 17</div>
 </div>
 
 
@@ -1581,7 +1382,7 @@ h2{
       <div class="pill">Help is brave</div>
     </div>
   </div>
-  <div class="slide-num">17 / 19</div>
+  <div class="slide-num">17 / 18</div>
 </div>
 
 
@@ -1662,64 +1463,7 @@ h2{
     </div>
   </div>
 
-  <div class="slide-num">18 / 19</div>
-</div>
-
-
-<!-- ════════════════════════════════════════════════════════════
-  SLIDE 19 · THANK YOU
-════════════════════════════════════════════════════════════ -->
-<div class="slide" id="s19">
-  <div class="slide-tint" style="background:
-    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(232,0,61,0.16)  0%, transparent 60%),
-    radial-gradient(ellipse 70% 55% at 80% 80%, rgba(26,111,255,0.15) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 50%, rgba(180,0,200,0.08)  0%, transparent 65%);"></div>
-  <div class="grid-micro"></div>
-
-  <div class="ty-orbit ty-orbit-1"></div>
-  <div class="ty-orbit ty-orbit-2"></div>
-  <div class="ty-orbit ty-orbit-3"></div>
-
-  <div id="ty-words"></div>
-
-  <div class="card ty-card reveal r1" style="max-width:980px;text-align:center;padding:4rem 5rem;position:relative;z-index:10;overflow:visible;">
-    <div class="ty-shimmer-rule"></div>
-
-    <div class="ty-icon-row reveal r1">
-      <span class="ty-icon" style="animation-delay:.05s;">💙</span>
-      <span class="ty-icon" style="animation-delay:.18s;">🌿</span>
-      <span class="ty-icon" style="animation-delay:.31s;">✨</span>
-      <span class="ty-icon" style="animation-delay:.44s;">🌿</span>
-      <span class="ty-icon" style="animation-delay:.57s;">💙</span>
-    </div>
-
-    <div class="ty-main reveal r2">
-      <span class="ty-letter" style="--d:0s">T</span><span class="ty-letter" style="--d:.06s">H</span><span class="ty-letter" style="--d:.12s">A</span><span class="ty-letter" style="--d:.18s">N</span><span class="ty-letter" style="--d:.24s">K</span><span class="ty-letter ty-space">&nbsp;</span><span class="ty-letter" style="--d:.34s">Y</span><span class="ty-letter" style="--d:.40s">O</span><span class="ty-letter" style="--d:.46s">U</span>
-    </div>
-
-    <div class="ty-underline reveal r2"></div>
-
-    <p class="ty-sub reveal r3">for being here, for being honest, for being <em>brave.</em></p>
-
-    <div class="ty-dots reveal r3"><span></span><span></span><span></span></div>
-
-    <p class="ty-body reveal r4">
-      Mental health is not a destination — it is a daily practice.<br>
-      Every conversation we have breaks a wall of silence.<br>
-      Every story shared lightens someone else's load.
-    </p>
-
-    <div class="ty-credit reveal r4">
-      <div class="ty-credit-line"></div>
-      <span>Tobhana Wellness &nbsp;·&nbsp; Youth Mental Health Edition &nbsp;·&nbsp; 2025</span>
-      <div class="ty-credit-line"></div>
-    </div>
-
-    <div class="ty-pulse-ring ty-pr1"></div>
-    <div class="ty-pulse-ring ty-pr2"></div>
-  </div>
-
-  <div class="slide-num">19 / 19</div>
+  <div class="slide-num">18 / 18</div>
 </div>
 
 </div><!-- /deck -->
@@ -1856,7 +1600,6 @@ const transitions=[
   ['enter-synapse', 'exit-shrink',     800],  // S16
   ['enter-burst',   'exit-shrink',     900],  // S17
   ['enter-pulse',   'exit-shrink',     950],  // S18 graduation
-  ['enter-burst',   'exit-shrink',    1000],  // S19 thank you
 ];
 
 let animating=false;
@@ -1904,8 +1647,6 @@ function goTo(n){
     if(n===16) spawnConstellation();
     // Launch fireworks + init graduation slide for S18
     if(n===17){ initGradSlide(); launchFireworks(); }
-    // Thank you word float for S19
-    if(n===18) launchTyWords();
 
     setTimeout(()=>{animating=false;},dur+100);
   }, dur*.45);
@@ -1922,7 +1663,6 @@ document.addEventListener('keydown',e=>{
 
 document.getElementById('deck').addEventListener('click',e=>{
   if(e.target.closest('.nav-btn')) return;
-  if(e.target.closest('button')) return;  // ignore tab buttons on s18
   e.clientX>window.innerWidth/2 ? nextSlide() : prevSlide();
 });
 
@@ -2161,56 +1901,6 @@ function spawnConstellation(){
     `;
     c.appendChild(s);
   }
-}
-
-/* ════════════════════════════════════════════════════════════
-   THANK YOU WORD PARTICLES (S19)
-════════════════════════════════════════════════════════════ */
-function launchTyWords(){
-  const container = document.getElementById('ty-words');
-  if(!container){ return; }
-  container.innerHTML = '';
-
-  const words = [
-    'hope','courage','strength','love','care','growth','healing',
-    'brave','kind','resilient','valued','seen','heard','worthy',
-    'together','forward','rise','light','breathe','safe',
-    'thank you','persist','shine','believe','belong'
-  ];
-  const colors = [
-    'rgba(232,0,61,0.55)','rgba(26,111,255,0.52)',
-    'rgba(180,0,200,0.45)','rgba(0,160,130,0.5)',
-    'rgba(232,100,0,0.48)','rgba(10,22,40,0.38)'
-  ];
-  const sizes = ['0.85rem','0.95rem','1.1rem','1.3rem','1rem','0.9rem'];
-  let count = 0;
-  const maxWords = 70;
-
-  function spawnWord(){
-    if(count >= maxWords) return;
-    count++;
-    const w = document.createElement('span');
-    w.className = 'ty-word';
-    w.textContent = words[Math.floor(Math.random()*words.length)];
-    const x        = 3 + Math.random()*94;
-    const startY   = 2 + Math.random()*70;
-    const duration = 5 + Math.random()*5;
-    w.style.cssText = `
-      left:${x}%;top:${startY}%;
-      font-size:${sizes[Math.floor(Math.random()*sizes.length)]};
-      color:${colors[Math.floor(Math.random()*colors.length)]};
-      animation-duration:${duration}s;
-      animation-delay:${Math.random()*1.5}s;
-    `;
-    container.appendChild(w);
-    w.addEventListener('animationend',()=>{ if(w.parentNode) w.remove(); });
-  }
-
-  for(let i=0;i<20;i++) setTimeout(spawnWord, i*100);
-  const trickle = setInterval(()=>{
-    if(count >= maxWords){ clearInterval(trickle); return; }
-    spawnWord();
-  }, 320);
 }
 </script>
 </body>
