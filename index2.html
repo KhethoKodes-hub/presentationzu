@@ -32,24 +32,74 @@
 html,body{
   width:100%;height:100%;overflow:hidden;
   font-family:'Outfit',sans-serif;
-  background: linear-gradient(135deg, #f0f6ff 0%, #fff8f8 50%, #ffffff 100%);
+  background:#e8eef8;
   cursor:none;
 }
+
+/* ════════════════════════════════════════════════════════════
+   ANIMATED GRADIENT MESH BACKGROUND
+════════════════════════════════════════════════════════════ */
+#bg-mesh {
+  position:fixed;inset:0;z-index:0;
+  background: linear-gradient(135deg, #dce8ff 0%, #f5e8ef 30%, #ffd6de 55%, #dceeff 80%, #e8f0ff 100%);
+  background-size:400% 400%;
+  animation: mesh-flow 14s ease-in-out infinite alternate;
+}
+@keyframes mesh-flow {
+  0%   { background-position: 0% 0%;   }
+  25%  { background-position: 100% 20%; }
+  50%  { background-position: 60% 100%; }
+  75%  { background-position: 20% 60%;  }
+  100% { background-position: 100% 100%;}
+}
+/* Radial colour blobs layered on top */
+#bg-mesh::before {
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 55% 40% at 15% 20%,  rgba(232,0,61,0.13)   0%, transparent 70%),
+    radial-gradient(ellipse 50% 45% at 85% 15%,  rgba(26,111,255,0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 35% at 50% 85%,  rgba(200,50,120,0.09) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 80% 70%,  rgba(26,111,255,0.1)  0%, transparent 70%),
+    radial-gradient(ellipse 45% 40% at 25% 75%,  rgba(232,0,61,0.07)   0%, transparent 70%);
+  animation: blobs-drift 18s ease-in-out infinite alternate;
+}
+@keyframes blobs-drift {
+  0%   { transform: translate(0,0)     scale(1);   }
+  33%  { transform: translate(30px,-20px) scale(1.04); }
+  66%  { transform: translate(-20px,30px) scale(0.97); }
+  100% { transform: translate(15px,15px)  scale(1.02); }
+}
+#bg-mesh::after {
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 35% 30% at 60% 40%, rgba(255,255,255,0.55) 0%, transparent 65%),
+    radial-gradient(ellipse 25% 25% at 30% 50%, rgba(255,255,255,0.40) 0%, transparent 60%);
+  /* pearl gloss hotspots */
+}
+
+/* per-slide colour tint overlays */
+.slide-tint {
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  transition: opacity 1s ease;
+}
+
 
 /* ════════════════════════════════════════════════════════════
    NEURAL CANVAS (behind everything)
 ════════════════════════════════════════════════════════════ */
 #neural-canvas{
-  position:fixed;inset:0;z-index:0;
+  position:fixed;inset:0;z-index:2;
   pointer-events:none;
+  opacity:0.85;
+  mix-blend-mode: multiply;
 }
 
 /* ════════════════════════════════════════════════════════════
    GRAIN OVERLAY (texture)
 ════════════════════════════════════════════════════════════ */
 #grain{
-  position:fixed;inset:0;z-index:1;pointer-events:none;
-  opacity:0.03;
+  position:fixed;inset:0;z-index:3;pointer-events:none;
+  opacity:0.045;
   background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size:200px;
   animation:grain-shift 0.4s steps(1) infinite;
@@ -81,7 +131,7 @@ html,body{
 /* ════════════════════════════════════════════════════════════
    GLOBAL SLIDE SHELL
 ════════════════════════════════════════════════════════════ */
-#deck{position:relative;width:100vw;height:100vh;overflow:hidden;}
+#deck{position:relative;width:100vw;height:100vh;overflow:hidden;z-index:10;}
 
 .slide{
   position:absolute;inset:0;
@@ -136,45 +186,49 @@ html,body{
 }
 
 /* ════════════════════════════════════════════════════════════
-   GLASS CARD  (bright, pearlescent)
+   GLASS CARD  (chromatic pearl — not plain white)
 ════════════════════════════════════════════════════════════ */
 .card{
   position:relative;z-index:5;
-  background:linear-gradient(135deg,
-    rgba(255,255,255,0.88) 0%,
-    rgba(240,246,255,0.82) 40%,
-    rgba(255,248,248,0.85) 100%);
-  backdrop-filter:blur(28px) saturate(200%);
-  -webkit-backdrop-filter:blur(28px) saturate(200%);
-  border:1.5px solid rgba(255,255,255,0.95);
+  background:linear-gradient(145deg,
+    rgba(255,255,255,0.78) 0%,
+    rgba(224,238,255,0.70) 35%,
+    rgba(255,235,240,0.72) 70%,
+    rgba(240,248,255,0.75) 100%);
+  backdrop-filter:blur(32px) saturate(220%);
+  -webkit-backdrop-filter:blur(32px) saturate(220%);
+  border:1.5px solid rgba(255,255,255,0.85);
+  border-top:1.5px solid rgba(255,255,255,0.98);
+  border-left:1.5px solid rgba(255,255,255,0.92);
   border-radius:2.8rem;
   padding:3rem 4rem;
   max-width:1360px;width:calc(100% - 5rem);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.6) inset,
-    0 4px 0 rgba(255,255,255,0.9) inset,
-    0 50px 100px -20px rgba(10,22,40,0.12),
-    0 20px 40px -10px rgba(26,111,255,0.08),
-    var(--shadow-red);
-  transition:box-shadow .4s,border-color .4s;
+    0 0 0 1px rgba(255,255,255,0.55) inset,
+    0 4px 0 rgba(255,255,255,0.85) inset,
+    0 50px 100px -20px rgba(10,22,40,0.18),
+    0 20px 40px -10px rgba(26,111,255,0.1),
+    0 20px 60px -10px rgba(232,0,61,0.12);
+  transition:box-shadow .4s,border-color .4s,transform .3s;
   overflow:hidden;
 }
 .card::before{
   content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--red-soft),var(--blue-soft),transparent);
-  opacity:0.7;
+  background:linear-gradient(90deg,transparent 0%,var(--red-soft) 30%,var(--blue-soft) 70%,transparent 100%);
+  opacity:0.85;
 }
 .card::after{
   content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(26,111,255,0.3),transparent);
+  background:linear-gradient(90deg,transparent,rgba(26,111,255,0.35),transparent);
 }
 .card:hover{
+  transform:translateY(-2px);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.9) inset,
+    0 0 0 1px rgba(255,255,255,0.85) inset,
     0 4px 0 rgba(255,255,255,0.95) inset,
-    0 60px 120px -20px rgba(10,22,40,0.16),
-    0 0 80px -20px rgba(232,0,61,0.12),
-    0 0 80px -20px rgba(26,111,255,0.12);
+    0 70px 130px -20px rgba(10,22,40,0.2),
+    0 0 90px -20px rgba(232,0,61,0.15),
+    0 0 90px -20px rgba(26,111,255,0.14);
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -299,7 +353,7 @@ h2{
 }
 .spin-ring-inner{
   position:absolute;inset:4px;
-  background:linear-gradient(135deg,#f0f6ff,#fff8f8);
+  background:linear-gradient(135deg,#dce8ff,#ffe8ef,#f0f6ff);
   border-radius:inherit;z-index:1;
 }
 .img-wrap img{
@@ -644,6 +698,9 @@ h2{
 </head>
 <body>
 
+<!-- ── BG MESH ──────────────────────────────────── -->
+<div id="bg-mesh"></div>
+
 <!-- ── NEURAL CANVAS ───────────────────────────── -->
 <canvas id="neural-canvas"></canvas>
 <div id="grain"></div>
@@ -666,6 +723,8 @@ h2{
   SLIDE 1 · COVER
 ════════════════════════════════════════════════════════════ -->
 <div class="slide active" id="s1">
+  <!-- slide tint: warm coral rose -->
+  <div class="slide-tint" style="background:radial-gradient(ellipse 80% 70% at 80% 40%, rgba(255,100,120,0.18) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 10% 80%, rgba(26,111,255,0.1) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <!-- ripple rings positioned on card -->
   <div class="ripple-ring" style="animation-delay:0s;"></div>
@@ -697,6 +756,7 @@ h2{
   SLIDE 2 · OPENING QUESTION
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s2">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 75% 65% at 20% 30%, rgba(100,80,220,0.12) 0%, transparent 65%), radial-gradient(ellipse 55% 50% at 85% 75%, rgba(232,0,61,0.1) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="text-side">
@@ -730,6 +790,7 @@ h2{
   SLIDE 3 · MENTAL HEALTH MATTERS
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s3">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 80% 60% at 15% 50%, rgba(26,111,255,0.14) 0%, transparent 65%), radial-gradient(ellipse 60% 70% at 85% 20%, rgba(200,50,150,0.1) 0%, transparent 65%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="img-wrap reveal r2">
@@ -761,6 +822,7 @@ h2{
   SLIDE 4 · THE HIDDEN SIDE
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s4">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 70% 60% at 85% 55%, rgba(232,0,61,0.15) 0%, transparent 60%), radial-gradient(ellipse 65% 55% at 15% 20%, rgba(10,22,40,0.06) 0%, transparent 65%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="text-side reveal r1">
@@ -792,6 +854,7 @@ h2{
   SLIDE 5 · SIX SCARS OVERVIEW
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s5">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 50% 50% at 50% 50%, rgba(232,0,61,0.07) 0%, transparent 70%), radial-gradient(ellipse 80% 40% at 0% 100%, rgba(26,111,255,0.1) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 100% 0%, rgba(180,0,200,0.07) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <div class="card reveal r1" style="max-width:1200px;">
     <div class="pill"><span class="dot"></span>The 6 unseen scars</div>
@@ -837,6 +900,7 @@ h2{
   SLIDE 6 · CHRONIC STRESS
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s6">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 75% 65% at 80% 50%, rgba(232,0,61,0.16) 0%, transparent 60%), radial-gradient(ellipse 55% 45% at 10% 30%, rgba(26,111,255,0.08) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <!-- pressure rings -->
   <div class="pressure-ring" style="width:300px;height:300px;left:75%;top:50%;animation-delay:0s;"></div>
@@ -869,6 +933,7 @@ h2{
   SLIDE 7 · IMPOSTER SYNDROME
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s7">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 90% 70% at 50% 50%, rgba(80,40,200,0.09) 0%, transparent 65%), radial-gradient(ellipse 50% 40% at 90% 85%, rgba(0,180,180,0.08) 0%, transparent 55%);"></div>
   <div class="grid-micro"></div>
   <!-- ghost text -->
   <div class="ghost-text" style="top:10%;left:5%;font-size:5rem;transform:rotate(-8deg);">FRAUD?</div>
@@ -903,6 +968,7 @@ h2{
   SLIDE 8 · PERFORMANCE ANXIETY
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s8">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 70% 60% at 20% 60%, rgba(255,80,0,0.1) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 80% 30%, rgba(232,0,61,0.12) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <!-- EKG heartbeat line at bottom -->
   <div class="ekg-line">
@@ -947,6 +1013,7 @@ h2{
   SLIDE 9 · SPIRITUAL GUILT
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s9">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 80% 60% at 50% 10%, rgba(255,210,80,0.14) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 85% 80%, rgba(232,100,0,0.08) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <!-- light rays -->
   <div class="light-ray" style="left:20%;height:60%;animation-delay:0s;"></div>
@@ -983,6 +1050,7 @@ h2{
   SLIDE 10 · QUIET DEPRESSION
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s10">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 85% 65% at 40% 40%, rgba(100,140,255,0.13) 0%, transparent 65%), radial-gradient(ellipse 55% 45% at 90% 80%, rgba(60,100,220,0.09) 0%, transparent 55%);"></div>
   <div class="grid-micro"></div>
   <!-- mist blobs -->
   <div class="mist" style="width:500px;height:300px;top:10%;left:-100px;animation-delay:0s;"></div>
@@ -1014,6 +1082,7 @@ h2{
   SLIDE 11 · FUNCTIONAL BURNOUT
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s11">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 75% 55% at 20% 70%, rgba(255,120,0,0.1) 0%, transparent 60%), radial-gradient(ellipse 65% 55% at 85% 25%, rgba(232,0,61,0.1) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="text-side reveal r1">
@@ -1050,6 +1119,7 @@ h2{
   SLIDE 12 · ACADEMIC PRESSURE
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s12">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 70% 60% at 15% 50%, rgba(26,111,255,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 85% 30%, rgba(232,0,61,0.09) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="img-wrap reveal r2">
@@ -1079,6 +1149,7 @@ h2{
   SLIDE 13 · COMPARISON TRAP
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s13">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 75% 55% at 80% 60%, rgba(180,0,200,0.1) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 10% 40%, rgba(26,111,255,0.1) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="text-side reveal r1">
@@ -1107,6 +1178,7 @@ h2{
   SLIDE 14 · SILENT SHAME
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s14">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 70% 60% at 20% 50%, rgba(100,100,200,0.1) 0%, transparent 60%), radial-gradient(ellipse 60% 50% at 85% 70%, rgba(232,0,61,0.1) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="img-wrap reveal r2">
@@ -1134,6 +1206,7 @@ h2{
   SLIDE 15 · BREAK THE STIGMA
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s15">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 75% 65% at 20% 40%, rgba(0,180,120,0.1) 0%, transparent 60%), radial-gradient(ellipse 65% 55% at 85% 65%, rgba(26,111,255,0.12) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <div class="card row">
     <div class="text-side reveal r1">
@@ -1162,6 +1235,7 @@ h2{
   SLIDE 16 · SUPPORTING WELLBEING
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s16">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 80% 60% at 50% 30%, rgba(26,111,255,0.1) 0%, transparent 65%), radial-gradient(ellipse 55% 50% at 10% 85%, rgba(0,200,150,0.08) 0%, transparent 55%);"></div>
   <div class="grid-micro"></div>
   <div class="card reveal r1" style="max-width:1200px;">
     <div class="pill"><span class="dot"></span>Everyday tools</div>
@@ -1189,6 +1263,7 @@ h2{
   SLIDE 17 · FINAL
 ════════════════════════════════════════════════════════════ -->
 <div class="slide" id="s17">
+  <div class="slide-tint" style="background:radial-gradient(ellipse 90% 70% at 50% 50%, rgba(232,0,61,0.12) 0%, transparent 60%), radial-gradient(ellipse 70% 60% at 0% 100%, rgba(26,111,255,0.1) 0%, transparent 60%), radial-gradient(ellipse 70% 60% at 100% 0%, rgba(255,150,50,0.08) 0%, transparent 60%);"></div>
   <div class="grid-micro"></div>
   <!-- constellation stars will be injected by JS -->
   <div id="stars-container" style="position:absolute;inset:0;pointer-events:none;z-index:1;"></div>
@@ -1253,20 +1328,21 @@ class Neuron {
     this.y = init ? Math.random()*NH : -20;
     this.vx= (Math.random()-.5)*0.35;
     this.vy= (Math.random()-.5)*0.35;
-    this.r = Math.random()*3+1.5;
-    this.life=0; this.maxLife=220+Math.random()*200;
+    this.r = Math.random()*2.5+1;
+    this.life=0; this.maxLife=180+Math.random()*200;
     const t=Math.random();
-    // pearl whites, soft reds, soft blues
-    if(t<0.5)      this.col=[220,0,61];
-    else if(t<0.8) this.col=[26,111,255];
-    else           this.col=[10,22,40];
+    // vivid palette — looks great under multiply blend
+    if(t<0.35)      this.col=[210,0,55];    // crimson
+    else if(t<0.6)  this.col=[20,90,220];   // cobalt
+    else if(t<0.78) this.col=[140,0,180];   // violet
+    else            this.col=[0,120,200];   // azure
   }
   update(){
     this.x+=this.vx; this.y+=this.vy; this.life++;
     if(this.life>this.maxLife||this.x<-50||this.x>NW+50||this.y<-50||this.y>NH+50) this.reset(false);
   }
   draw(){
-    const a=Math.sin(this.life/this.maxLife*Math.PI)*0.55;
+    const a=Math.sin(this.life/this.maxLife*Math.PI)*0.75;
     const [r,g,b]=this.col;
     nctx.beginPath();
     nctx.arc(this.x,this.y,this.r,0,Math.PI*2);
@@ -1295,14 +1371,13 @@ function drawSynapses(){
       if(dist<160){
         const ai=Math.sin(neurons[i].life/neurons[i].maxLife*Math.PI);
         const aj=Math.sin(neurons[j].life/neurons[j].maxLife*Math.PI);
-        const a=(ai+aj)*0.5*(1-dist/160)*0.25;
+        const a=(ai+aj)*0.5*(1-dist/160)*0.4;
         nctx.beginPath();
         nctx.moveTo(neurons[i].x,neurons[i].y);
         nctx.lineTo(neurons[j].x,neurons[j].y);
-        // blend red and blue
-        const blend=Math.random()>.5?`rgba(232,0,61,${a})`:`rgba(26,111,255,${a})`;
+        const blend=Math.random()>.5?`rgba(210,0,55,${a})`:`rgba(20,90,220,${a})`;
         nctx.strokeStyle=blend;
-        nctx.lineWidth=0.8;
+        nctx.lineWidth=1.0;
         nctx.stroke();
       }
     }
